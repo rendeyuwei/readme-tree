@@ -1,8 +1,13 @@
 {
 	"name": "readme-tree",
-	"displayName": "readme-tree", 
-	"description": "在你的readme中右键，点击Get Directory Tree，一键生成树结构",
+	"displayName": "readme-tree",
+	"description": "auto generate directory tree in your readme",
 	"version": "0.0.1",
+	"publisher": "rende",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/rendeyuwei/readme-tree"
+	},
 	"engines": {
 		"vscode": "^1.66.0"
 	},
@@ -21,11 +26,13 @@
 			}
 		],
 		"menus": {
-			"editor/context": [{
-				"command": "readme-tree.GetDirTree",
-				"when": "resourceExtname == .md",
-				"group": "navigation"
-			}]
+			"editor/context": [
+				{
+					"command": "readme-tree.GetDirTree",
+					"when": "resourceExtname == .md",
+					"group": "navigation"
+				}
+			]
 		}
 	},
 	"scripts": {
