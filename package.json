@@ -33,6 +33,25 @@
 					"group": "navigation"
 				}
 			]
+		},
+		"configuration": {
+			"title": "readme-tree",
+			"properties": {
+				"readme-tree.deep": {
+					"type": ["number", "null"],
+					"description": "Show project structure depth",
+					"default": "null"
+				},
+				"readme-tree.ignoreFile": {
+					"type": "array",
+					"description": "Ignore files in project structure",
+					"default": [
+						".git",
+						"node_modules",
+						".idea"
+					]
+				}
+			}
 		}
 	},
 	"scripts": {

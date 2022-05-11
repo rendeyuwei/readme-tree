@@ -21,15 +21,17 @@ function activate(context) {
 	// The commandId parameter must match the command field in package.json
 	let disposable = vscode.commands.registerCommand('readme-tree.GetDirTree', function (param) {
 		// The code you place here will be executed every time your command is executed
+		// let runtimePath = param.fsPath (it's Equivalent)
 		const runtimePath = vscode.window.activeTextEditor.document.fileName;
-		// let runtimePath = param.fsPath
+		const deep = vscode.workspace.getConfiguration('readme-tree').get('deep')
+		const ignoreFile = vscode.workspace.getConfiguration('readme-tree').get('ignoreFile')
 
 		const pathArr = runtimePath.split('\\')
 		pathArr.pop()
 		const runtimeDirectory = pathArr.join('\\')
 		Object.assign(result, { path: runtimeDirectory, title: path.basename(runtimeDirectory), type: 'directory', deep: 0, extname: path.extname(runtimeDirectory) })
 
-		readDirs(runtimeDirectory)
+		readDirs(runtimeDirectory, 0, deep, ignoreFile)
 		const treeDir = getFileTree(result)
 
 		// console.log(result);
@@ -47,20 +49,20 @@ function activate(context) {
 // this method is called when your extension is deactivated
 function deactivate() { }
 
-let ignoreFile = ['.git', '.idea', 'node_modules']
 let result = {}
-function readDirs(url, index = 0) {
+function readDirs(url, index = 0, deep, ignoreFile) {
+	let deepFlag = (typeof deep === "number" ? (index < deep) : true)
 	result.child = result.child || []
 	const res = fs.readdirSync(url)
 	res.map(item => {
 		const itemPath = path.join(url, item)
 		const isDirectory = fs.statSync(itemPath).isDirectory()
 		const extname = path.extname(item)
-		if (isDirectory && !isInclude(item)) {
+		if (isDirectory && !ignoreFile.includes(item) && deepFlag) {
 			result.child.push({ path: itemPath, title: path.basename(itemPath), type: 'directory', deep: index + 1, extname: extname })
-			readDirs(itemPath, index + 1)	
+			readDirs(itemPath, index + 1, deep, ignoreFile)
 		}
-		if (!isDirectory && !isInclude(item) && index === 0) {
+		if (!isDirectory && !ignoreFile.includes(item) && index === 0 && deepFlag) {
 			result.child.push({ path: itemPath, title: path.basename(itemPath), type: 'file', deep: index + 1, extname: extname })
 		}
 	})
@@ -74,7 +76,7 @@ function getFileTree(data) {
 
 function generateTree(data) {
 	let result = ''
-	if(data.deep === 0){
+	if (data.deep === 0) {
 		result = '\n'
 	}
 	result += `${getSpace(data.deep)}${data.title}\n`
@@ -106,10 +108,6 @@ function enterText(text) {
 			editBuilder.insert(editor.selection.active, text);
 		});
 	}
-}
-
-function isInclude(data) {
-	return ignoreFile.includes(data)
 }
 
 module.exports = {
